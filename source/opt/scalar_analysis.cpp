@@ -556,6 +556,18 @@ namespace {
 template <typename T, size_t size_of_t>
 struct PushToStringImpl;
 
+#if defined(__CHERI_PURE_CAPABILITY__)
+template <typename T>
+struct PushToStringImpl<T, 16> {
+  void operator()(T id, std::u32string* str) {
+    str->push_back(static_cast<uint32_t>(id >> 96));
+    str->push_back(static_cast<uint32_t>(id >> 64));
+    str->push_back(static_cast<uint32_t>(id >> 32));
+    str->push_back(static_cast<uint32_t>(id));
+  }
+};
+#endif // defined(__CHERI_PURE_CAPABILITY__)
+
 template <typename T>
 struct PushToStringImpl<T, 8> {
   void operator()(T id, std::u32string* str) {
